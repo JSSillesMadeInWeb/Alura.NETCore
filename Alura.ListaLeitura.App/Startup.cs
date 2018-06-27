@@ -1,9 +1,11 @@
 ﻿using Alura.ListaLeitura.App.Negocio;
 using Alura.ListaLeitura.App.Repositorio;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,7 +27,7 @@ namespace Alura.ListaLeitura.App
             services.AddRouting();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory )
         {
             var builder = new RouteBuilder(app);
             builder.MapRoute("Livros/ParaLer", LivrosParaLer);
@@ -55,6 +57,20 @@ namespace Alura.ListaLeitura.App
             //app.Run(Roteamento);
 
             //cada rota, encapsulada em um objeto
+
+
+            /*
+             * Para mostrar o erro de código 500
+            loggerFactory.AddConsole();
+            env.EnvironmentName = EnvironmentName.Production;
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/error");
+            }*/
         }
 
         private Task ProcessaFormulario(HttpContext context)
@@ -74,23 +90,30 @@ namespace Alura.ListaLeitura.App
 
         private Task ExibeFormulario(HttpContext context)
         {
-            var html = @"
+            /*var html = @"
                         <html>
                             <form action='/Cadastro/Incluir'>
-
                                 <label>Título:</label>      
                                 <input name='titulo'/>
                                 <br>
-
                                 <label>Autor:</label>
                                 <input name='autor'/>
                                 <br>
-
                                 <button>Gravar</button>
                             </form>
                         </html>   
-                        ";
+                        ";*/
+            var html = CarregaArquivoHTML("formulario");
             return context.Response.WriteAsync(html);
+        }
+
+        private string CarregaArquivoHTML(string nomeArquivo)
+        {
+            var nomeCompletoArquivo = $"HTML/{nomeArquivo}.html";
+            using(var arquivo = File.OpenText(nomeCompletoArquivo))
+            {
+                return arquivo.ReadToEnd();
+            }
         }
 
         private Task ExibeDetalhes(HttpContext context)
