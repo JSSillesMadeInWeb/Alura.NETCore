@@ -1,4 +1,5 @@
-﻿using Alura.ListaLeitura.App.Negocio;
+﻿using Alura.ListaLeitura.App.Logica;
+using Alura.ListaLeitura.App.Negocio;
 using Alura.ListaLeitura.App.Repositorio;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,24 +28,34 @@ namespace Alura.ListaLeitura.App
             services.AddRouting();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory )
+        public void Configure(IApplicationBuilder app /*, IHostingEnvironment env, ILoggerFactory loggerFactory*/ )
         {
             var builder = new RouteBuilder(app);
-            builder.MapRoute("Livros/ParaLer", LivrosParaLer);
-            builder.MapRoute("Livros/Lendo", LivrosLendo);
-            builder.MapRoute("Livros/Lidos", LivrosLidos);
+
+            builder.MapRoute("Livros/ParaLer", LivrosLogica.LivrosParaLer);
+            builder.MapRoute("Livros/Lendo", LivrosLogica.LivrosLendo);
+            builder.MapRoute("Livros/Lidos", LivrosLogica.LivrosLidos);
+            builder.MapRoute("Livros/Detalhes/{id:int}", LivrosLogica.ExibeDetalhes);
+            builder.MapRoute("Cadastro/NovoLivro/{nome}/{autor}", CadastroLogica.NovoLivroParaLer);
+            builder.MapRoute("Cadastro/NovoLivro", CadastroLogica.ExibeFormulario);
+            builder.MapRoute("Cadastro/Incluir", CadastroLogica.ProcessaFormulario);
+
+
+            /*builder.MapRoute("Livros/ParaLer", LivrosLogica.LivrosParaLer);
+            builder.MapRoute("Livros/Lendo", LivrosLogica.LivrosLendo);
+            builder.MapRoute("Livros/Lidos", LivrosLogica.LivrosLidos);*/
 
             /*Passando o nome e o autor, via url*/
             //builder.MapRoute("Cadastro/NovoLivro/{nome}/{autor}", NovoLivroParaLer);
 
             //segundo argumento, é o RequestDelegate para atender este tipo de requisição
             /*Colocar restrição para as rotas, só entro, se tipo do id for inteiro*/
-            builder.MapRoute("Livros/Detalhes/{id:int}", ExibeDetalhes);
+            /*builder.MapRoute("Livros/Detalhes/{id:int}", ExibeDetalhes);
 
             builder.MapRoute("Cadastro/NovoLivro", ExibeFormulario);
 
-            builder.MapRoute("Cadastro/Incluir", ProcessaFormulario);
-                       
+            builder.MapRoute("Cadastro/Incluir", ProcessaFormulario);*/
+
             /*
              * Rota com template, se adequa a varias requisições, com caminhos diferentes
              */
@@ -57,20 +68,20 @@ namespace Alura.ListaLeitura.App
             //app.Run(Roteamento);
 
             //cada rota, encapsulada em um objeto
-            
+
             /*
              * Para mostrar o erro de código 500*/
-                loggerFactory.AddConsole();
-                env.EnvironmentName = EnvironmentName.Production;
-                if (env.IsDevelopment())
-                {
-                    app.UseDeveloperExceptionPage();
-                }
-                else
-                {
-                    app.UseExceptionHandler("/error");
-                }
-            /**/
+            /*   loggerFactory.AddConsole();
+               env.EnvironmentName = EnvironmentName.Production;
+               if (env.IsDevelopment())
+               {
+                   app.UseDeveloperExceptionPage();
+               }
+               else
+               {
+                   app.UseExceptionHandler("/error");
+               }
+           */
         }
 
         private Task ProcessaFormulario(HttpContext context)
@@ -88,6 +99,16 @@ namespace Alura.ListaLeitura.App
             return context.Response.WriteAsync("O livro foi adicionado com sucesso");
         }
 
+        private string CarregaArquivoHTML(string nomeArquivo)
+        {
+            /* verificar o que está acontecendo (erro: IO) */
+            var nomeCompletoArquivo = $"HTML/{nomeArquivo}.html";
+            using(var arquivo = File.OpenText(nomeCompletoArquivo))
+            {
+                return arquivo.ReadToEnd();
+            }
+        }
+
         private Task ExibeFormulario(HttpContext context)
         {
             /*var html = @"
@@ -103,32 +124,11 @@ namespace Alura.ListaLeitura.App
                             </form>
                         </html>   
                         ";*/
-                        //formulario
+            //formulario
             var html = CarregaArquivoHTML("formulario");
             return context.Response.WriteAsync(html);
         }
 
-        private string CarregaArquivoHTML(string nomeArquivo)
-        {
-            /*
-             verificar o que está acontecendo
-             erro: IO
-             */
-            var nomeCompletoArquivo = $"HTML/{nomeArquivo}.html";
-            using(var arquivo = File.OpenText(nomeCompletoArquivo))
-            {
-                return arquivo.ReadToEnd();
-            }
-        }
-
-        private Task ExibeDetalhes(HttpContext context)
-        {
-            int id = Convert.ToInt32(context.GetRouteValue("id"));
-            var repo = new LivroRepositorioCSV();
-            var livro = repo.Todos.First(l => l.Id == id);
-            return context.Response.WriteAsync(livro.Detalhes());
-        }
-        
         //REQUES DELEGATE
         public Task NovoLivroParaLer(HttpContext context)
         {
@@ -144,7 +144,7 @@ namespace Alura.ListaLeitura.App
             return context.Response.WriteAsync("O livro foi adicionado com sucesso");
         }
 
-        public Task Roteamento(HttpContext context)
+        /*public Task Roteamento(HttpContext context)
         {
             var _repo = new LivroRepositorioCSV();
             /*
@@ -152,7 +152,7 @@ namespace Alura.ListaLeitura.App
              * Ideal: colocar em um local isolado
              *  var caminhoAtendidos = new Dictionary<string, string>
              */
-            var caminhoAtendidos = new Dictionary<string, RequestDelegate>
+            /*var caminhoAtendidos = new Dictionary<string, RequestDelegate>
             {
                 {"/Livros/ParaLer", LivrosParaLer},
                 {"/Livros/Lendo", LivrosLendo},
@@ -163,47 +163,16 @@ namespace Alura.ListaLeitura.App
             {
                 var metodo = caminhoAtendidos[context.Request.Path];
                 return metodo.Invoke(context);
-            }
+            }*/
 
             /* o cara que tem o endereço da requisição (context.Request.Path)*/
             /*ao inves de mostrar a mensagem abaixo, 
              iremos mostrar o codigo de erro, atraves da propriedade response*/
-            context.Response.StatusCode = 404;
+            /*context.Response.StatusCode = 404;
             return context.Response.WriteAsync("Caminho inexistente");
-        }
+        }*/
         
 
-        /* AO chegar uma requisição, mostrar a lista de 
-         * livrosp para ler
-         * Passando como parametro, estou dizendo que preciso de um cara deste tipo
-         */
-        public Task LivrosParaLer(HttpContext context)
-        {
-            var _repo = new LivroRepositorioCSV();
-            var conteudoArquivo = CarregaArquivoHTML("para-ler");
-            
-            //return context.Response.WriteAsync(_repo.ParaLer.ToString());
-
-            foreach(var livro in _repo.ParaLer.Livros)
-            {
-                conteudoArquivo = conteudoArquivo.Replace("#NOVO-ITEM#", $"<li>{livro.Titulo} - {livro.Autor}</li>#NOVO-ITEM#");
-            }
-
-            conteudoArquivo = conteudoArquivo.Replace("#NOVO-ITEM#", "");
-
-            return context.Response.WriteAsync(conteudoArquivo);
-        }
-
-        public Task LivrosLendo(HttpContext context)
-        {
-            var _repo = new LivroRepositorioCSV();
-            return context.Response.WriteAsync(_repo.Lendo.ToString());
-        }
-
-        public Task LivrosLidos(HttpContext context)
-        {
-            var _repo = new LivroRepositorioCSV();
-            return context.Response.WriteAsync(_repo.Lidos.ToString());
-        }
+        
     }
 }

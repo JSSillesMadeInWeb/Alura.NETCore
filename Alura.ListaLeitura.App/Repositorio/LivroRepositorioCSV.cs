@@ -9,17 +9,9 @@ namespace Alura.ListaLeitura.App.Repositorio
 {
     public class LivroRepositorioCSV : ILivroRepositorio
     {
-        //quando rodar em casa, lembrar de mudar o caminho
-
+        
         private static readonly string nomeArquivoCSV = "C:\\Users\\Made in web\\Desktop\\JacquelineSilles" +
             "\\Alura.ListaLeitura\\Alura.ListaLeitura.App\\Repositorio\\livros.csv";
-        //"C:\\Users\\JacquelineSilles\\Repositorio\\livros.csv";
-        //"C:\\Users\\Made in web\\Desktop\\JacquelineSilles\\Alura.ListaLeitura" +
-        //"\\Alura.ListaLeitura.App\\Repositorio\\livros.csv";
-
-        //C:\Users\Made in web\Desktop\Repositorio;
-        //C:\Users\Made in web\Desktop\JacquelineSilles\Alura.ListaLeitura\Alura.ListaLeitura.App\Repositorio
-
 
         private ListaDeLeitura _paraLer;
         private ListaDeLeitura _lendo;
