@@ -157,7 +157,6 @@ namespace Alura.ListaLeitura.App
                 {"/Livros/ParaLer", LivrosParaLer},
                 {"/Livros/Lendo", LivrosLendo},
                 {"/Livros/Lidos", LivrosLidos}
-
             };
 
             if (caminhoAtendidos.ContainsKey(context.Request.Path))
@@ -179,9 +178,20 @@ namespace Alura.ListaLeitura.App
          * Passando como parametro, estou dizendo que preciso de um cara deste tipo
          */
         public Task LivrosParaLer(HttpContext context)
-        {            
+        {
             var _repo = new LivroRepositorioCSV();
-            return context.Response.WriteAsync(_repo.ParaLer.ToString());
+            var conteudoArquivo = CarregaArquivoHTML("para-ler");
+            
+            //return context.Response.WriteAsync(_repo.ParaLer.ToString());
+
+            foreach(var livro in _repo.ParaLer.Livros)
+            {
+                conteudoArquivo = conteudoArquivo.Replace("#NOVO-ITEM#", $"<li>{livro.Titulo} - {livro.Autor}</li>#NOVO-ITEM#");
+            }
+
+            conteudoArquivo = conteudoArquivo.Replace("#NOVO-ITEM#", "");
+
+            return context.Response.WriteAsync(conteudoArquivo);
         }
 
         public Task LivrosLendo(HttpContext context)
