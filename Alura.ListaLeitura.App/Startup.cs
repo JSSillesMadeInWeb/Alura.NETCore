@@ -35,7 +35,7 @@ namespace Alura.ListaLeitura.App
             builder.MapRoute("Livros/Lidos", LivrosLidos);
 
             /*Passando o nome e o autor, via url*/
-            builder.MapRoute("Cadastro/NovoLivro/{nome}/{autor}", NovoLivroParaLer);
+            //builder.MapRoute("Cadastro/NovoLivro/{nome}/{autor}", NovoLivroParaLer);
 
             //segundo argumento, é o RequestDelegate para atender este tipo de requisição
             /*Colocar restrição para as rotas, só entro, se tipo do id for inteiro*/
@@ -57,20 +57,20 @@ namespace Alura.ListaLeitura.App
             //app.Run(Roteamento);
 
             //cada rota, encapsulada em um objeto
-
-
+            
             /*
-             * Para mostrar o erro de código 500
-            loggerFactory.AddConsole();
-            env.EnvironmentName = EnvironmentName.Production;
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/error");
-            }*/
+             * Para mostrar o erro de código 500*/
+                loggerFactory.AddConsole();
+                env.EnvironmentName = EnvironmentName.Production;
+                if (env.IsDevelopment())
+                {
+                    app.UseDeveloperExceptionPage();
+                }
+                else
+                {
+                    app.UseExceptionHandler("/error");
+                }
+            /**/
         }
 
         private Task ProcessaFormulario(HttpContext context)
@@ -79,8 +79,8 @@ namespace Alura.ListaLeitura.App
             {
                 //pegando os valores da queryString
                 //Titulo = Convert.ToString(context.GetRouteValue("nome"));
-                Titulo = context.Request.Query["titulo"].First(),
-                Autor = context.Request.Query["autor"].First(),
+                Titulo = context.Request.Form["titulo"].First(),
+                Autor = context.Request.Form["autor"].First(),
             };
 
             var repo = new LivroRepositorioCSV();
@@ -103,12 +103,17 @@ namespace Alura.ListaLeitura.App
                             </form>
                         </html>   
                         ";*/
+                        //formulario
             var html = CarregaArquivoHTML("formulario");
             return context.Response.WriteAsync(html);
         }
 
         private string CarregaArquivoHTML(string nomeArquivo)
         {
+            /*
+             verificar o que está acontecendo
+             erro: IO
+             */
             var nomeCompletoArquivo = $"HTML/{nomeArquivo}.html";
             using(var arquivo = File.OpenText(nomeCompletoArquivo))
             {
