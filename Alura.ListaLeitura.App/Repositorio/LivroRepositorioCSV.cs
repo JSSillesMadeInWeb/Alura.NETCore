@@ -9,9 +9,11 @@ namespace Alura.ListaLeitura.App.Repositorio
 {
     public class LivroRepositorioCSV : ILivroRepositorio
     {
-        
-        private static readonly string nomeArquivoCSV = "C:\\Users\\Made in web\\Desktop\\JacquelineSilles" +
-            "\\Alura.ListaLeitura\\Alura.ListaLeitura.App\\Repositorio\\livros.csv";
+
+        /*private static readonly string nomeArquivoCSV = "C:\\Users\\Made in web\\Desktop\\JacquelineSilles" +
+            "\\Alura.ListaLeitura\\Alura.ListaLeitura.App\\Repositorio\\livros.csv";*/
+
+        private static readonly string nomeArquivoCSV = "C:\\Users\\Made in web\\Desktop\\livros.csv";
 
         private ListaDeLeitura _paraLer;
         private ListaDeLeitura _lendo;

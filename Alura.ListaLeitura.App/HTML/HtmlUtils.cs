@@ -9,6 +9,7 @@ namespace Alura.ListaLeitura.App.HTML
     {
         public static string CarregaArquivoHTML(string nomeArquivo)
         {
+            //var nomeCompletoArquivo = $"C:\\Users\\Made in web\\Desktop\\para-ler.html";
             var nomeCompletoArquivo = $"HTML/{nomeArquivo}.html";
             using (var arquivo = File.OpenText(nomeCompletoArquivo))
             {
